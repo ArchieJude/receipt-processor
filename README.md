@@ -33,7 +33,7 @@ receipt_processor/
 ### Step A: Clone the repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ArchieJude/receipt-processor.git
 cd receipt_processor
 ```
 
