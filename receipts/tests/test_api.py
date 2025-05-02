@@ -92,6 +92,35 @@ def test_process_receipt_missing_items(client):
     assert response.status_code == 400
     assert "The receipt is invalid." in response.data.get("error", "")
 
+@pytest.mark.parametrize(
+    "bad_payload,invalid_field",
+    [
+        # retailer should be string
+        ({"retailer": 12345, "purchaseDate": "2022-01-01", "purchaseTime": "13:01", "items": [], "total": "10.00"}, "retailer"),
+        
+        # purchaseDate should be string (formatted date)
+        ({"retailer": "Target", "purchaseDate": 20220101, "purchaseTime": "13:01", "items": [], "total": "10.00"}, "purchaseDate"),
+
+        # purchaseTime should be string (formatted time)
+        ({"retailer": "Target", "purchaseDate": "2022-01-01", "purchaseTime": 1301, "items": [], "total": "10.00"}, "purchaseTime"),
+
+        # items should be a list
+        ({"retailer": "Target", "purchaseDate": "2022-01-01", "purchaseTime": "13:01", "items": "not-a-list", "total": "10.00"}, "items"),
+
+        # total should be string (representing a decimal)
+        ({"retailer": "Target", "purchaseDate": "2022-01-01", "purchaseTime": "13:01", "items": [], "total": "ten"}, "total"),
+        
+        # total should be string (representing a decimal)
+        ({"retailer": "Target", "purchaseDate": "2022-01-01", "purchaseTime": "13:01", "items": [], "total": 10}, "total"),
+        
+    ]
+)
+def test_process_receipt_with_invalid_field_types(client, bad_payload, invalid_field):
+    url = reverse("process_receipt")
+    response = client.post(url, bad_payload, format="json")
+
+    assert response.status_code == 400
+    assert "The receipt is invalid." in response.data.get("error", "") or "The receipt is invalid." in str(response.data)
 
 def test_get_points_receipt_not_found(client):
     fake_receipt_id = str(uuid.uuid4())

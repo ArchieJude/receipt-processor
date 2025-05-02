@@ -71,6 +71,7 @@ docker compose run web pytest
 ### POST `/receipts/process`
 - Accepts receipt JSON
 - Returns: `{ "id": "<uuid>" }`
+- Returns 400 if inputs fields are missing or with incorrect type
 
 **Example:**
 ```json
