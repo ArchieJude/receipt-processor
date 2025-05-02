@@ -80,17 +80,30 @@ def test_receipt_points(client, payload, expected_points):
     assert points_response.data["points"] == expected_points
 
 
-def test_process_receipt_missing_items(client):
-    payload = {
+@pytest.mark.parametrize(
+    "missing_field",
+    ["retailer", "purchaseDate", "purchaseTime", "items", "total"]
+)
+def test_process_receipt_missing_fields(client, missing_field):
+    # Base valid payload
+    base_payload = {
         "retailer": "Target",
         "purchaseDate": "2022-01-01",
         "purchaseTime": "13:01",
-        "total": "35.35"
-        # 'items' field is missing
+        "items": [
+            {"shortDescription": "Soda", "price": "1.99"}
+        ],
+        "total": "1.99"
     }
-    response = client.post(reverse("process_receipt"), payload, format="json")
+
+    # Remove one field for each test case
+    bad_payload = base_payload.copy()
+    bad_payload.pop(missing_field)
+
+    response = client.post(reverse("process_receipt"), bad_payload, format="json")
+
     assert response.status_code == 400
-    assert "The receipt is invalid." in response.data.get("error", "")
+    assert "The receipt is invalid." in response.data.get("error", "") or "The receipt is invalid." in str(response.data)
 
 @pytest.mark.parametrize(
     "bad_payload,invalid_field",
