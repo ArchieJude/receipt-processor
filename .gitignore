@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+receipt_processor/
+
+# Django
+db.sqlite3
+*.log
+
+# Docker
+*.db
+*.pid
+*.sock
+.env
+.env.*
+
+# Pytest
+.cache/
+htmlcov/
+
+# VSCode or JetBrains
+.vscode/
+.idea/
